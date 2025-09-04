@@ -1,0 +1,20 @@
+{
+    "name": "Gaps N' Laps",
+    "description": "Enhances the Tripletex time report table by grouping entries, calculating total time, gaps, and overlaps, and visualizing them with a timeline.",
+    "version": "1.0",
+    "manifest_version": 3,
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": "icon.png"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://tripletex.no/execute/updateHourlist?*"],
+            "js": ["script.js"]
+        }
+    ],
+    "permissions": ["activeTab"]
+}
