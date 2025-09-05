@@ -1,0 +1,25 @@
+{
+  "name": "gaps-n-laps-js",
+  "version": "1.0.0",
+  "description": "Enhances the Tripletex time report table by grouping entries, calculating total time, gaps, and overlaps, and visualizing them with a timeline.",
+  "packageManager": "yarn@4.5.0",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "webpack --mode production"
+  },
+  "devDependencies": {
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1"
+  },
+  "contributors": [
+    {
+      "name": "Jørgen Tellnes"
+    },
+    {
+      "name": "Benjamin Dehli"
+    }
+  ]
+}
