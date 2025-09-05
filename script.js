@@ -329,9 +329,13 @@
 
             rect.setAttribute("x", `${x}%`);
             rect.setAttribute("y", "0");
+            rect.setAttribute("rx", "5"); // Rounded corners
+            rect.setAttribute("ry", "5"); // Rounded corners
             rect.setAttribute("width", `${width}%`);
             rect.setAttribute("height", "30");
             rect.setAttribute("fill", "rgba(0, 90, 214, 0.5)"); // Semi-transparent blue
+            rect.setAttribute("stroke", "#757c8a");
+            rect.setAttribute("stroke-width", "1");
 
             svg.appendChild(rect);
         });
