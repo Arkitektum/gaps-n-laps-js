@@ -370,43 +370,89 @@
    */
   function renderGroupInfo(groupedRows) {
     const maxGroupTotalTime = getMaxGroupTotalTime(groupedRows);
+    const contentContainerElement = document.getElementById("wrapperDiv");
+    const groupInfoElement = document.createElement("div");
+    groupInfoElement.style.border = "1px solid var(--atl-color-grey-20)";
+    groupInfoElement.style.borderRadius = "4px";
+    groupInfoElement.style.backgroundColor = "#FFF";
+    groupInfoElement.style.color = "var(--atl-color-grey-100)";
+    groupInfoElement.style.marginBottom = "16px";
+
+    const groupInfoTitleElement = document.createElement("div");
+    groupInfoTitleElement.style.display = "inline-block";
+    groupInfoTitleElement.style.margin = "6px 24px 6px 0";
+    groupInfoTitleElement.style.padding = "10px 24px";
+    groupInfoTitleElement.style.fontSize = "20px";
+    groupInfoTitleElement.style.lineHeight = "24px";
+    groupInfoTitleElement.style.fontWeight = "400";
+    groupInfoTitleElement.style.color = "var(--atl-color-grey-100)";
+    groupInfoTitleElement.style.fontFamily = "Rubik,Helvetica,Arial,'sans-serif'";
+    groupInfoTitleElement.textContent = "Gaps N' Laps";
+    groupInfoElement.appendChild(groupInfoTitleElement);
+
+    const groupInfoTableHeader = document.createElement("div");
+    const tableHeaderCellStyle = "font-size: 13px; line-height: 18px; font-weight: 500; font-family: Rubik, Helvetica, Arial, sans-serif; color: #666; background: var(--tlx-theme-pastel-color); padding-top: 16px; padding-bottom: 8px;";
+    groupInfoTableHeader.style.display = "flex";
+    groupInfoTableHeader.style.borderBottom = "1px solid #ddd";
+    groupInfoTableHeader.innerHTML = `
+        <div style="${tableHeaderCellStyle} flex: 1; padding-left: 24px; padding-right: 8px;">Dag</div>
+        <div style="${tableHeaderCellStyle} flex: 1; padding-left: 8px; padding-right: 8px;">Overlapp</div>
+        <div style="${tableHeaderCellStyle} flex: 1; padding-left: 8px; padding-right: 8px;">Pause</div>
+        <div style="${tableHeaderCellStyle} flex: 1; padding-left: 8px; padding-right: 8px;">Tid</div>
+        <div style="${tableHeaderCellStyle} flex: 3; padding-left: 8px; padding-right: 24px;">Tidslinje</div>
+    `;
+    groupInfoElement.appendChild(groupInfoTableHeader);
+
+    const groupInfoTableBody = document.createElement("div");
+
     groupedRows.forEach((group) => {
-      const headerRow = document.getElementById(group.headerRowElementId);
-      if (headerRow) {
-        adjustOriginalHeaderRowTd(headerRow);
-        // Create a new cell for total time
-        const totalTimeCell = document.createElement("td");
-        totalTimeCell.colSpan = 3; // Span across multiple columns for better visibility
-        totalTimeCell.style.textAlign = "right"; // Align text to the right
+      const row = document.createElement("div");
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.padding = "8px 0";
+      row.style.borderBottom = "1px solid #ddd";
+      row.style.padding = "10px 24px";
 
-        // Format total time in hours and minutes
-        const totalTimeElement = renderTotalTimeElement(group.totalTime);
-        const gapTimeElement = renderGapTimeElement(group.totalGapTimeMs);
-        const overlapTimeElement = renderOverlapTimeElement(
-          group.totalOverlapTimeMs
-        );
 
-        totalTimeCell.appendChild(overlapTimeElement);
-        totalTimeCell.appendChild(gapTimeElement);
-        totalTimeCell.appendChild(totalTimeElement);
+      // Date cell
+      const dateCell = document.createElement("div");
+      dateCell.style.flex = "1";
+      dateCell.style.fontWeight = "500";
+      dateCell.style.color = "#666";
+      dateCell.textContent = group.dayString || "Ukjent dag";
+      row.appendChild(dateCell);
 
-        // Insert the new cell after the last cell in the header row
-        headerRow.appendChild(totalTimeCell);
+      // Overlap time cell
+      const overlapCell = document.createElement("div");
+      overlapCell.style.flex = "1";
+      overlapCell.appendChild(renderOverlapTimeElement(group.totalOverlapTimeMs));
+      row.appendChild(overlapCell);
 
-        // Create row below for timeline
-        const timelineRow = document.createElement("tr");
-        const timelineCell = document.createElement("td");
-        timelineCell.colSpan = 4; // Span across all columns
-        timelineCell.style.padding = "4px 24px"; // Add some padding for better appearance
+      // Gap time cell
+      const gapCell = document.createElement("div");
+      gapCell.style.flex = "1";
+      gapCell.appendChild(renderGapTimeElement(group.totalGapTimeMs));
+      row.appendChild(gapCell);
 
-        const timelineSvg = renderSvgTimeline(group, maxGroupTotalTime);
-        timelineCell.appendChild(timelineSvg);
-        timelineRow.appendChild(timelineCell);
+      // Total time cell
+      const totalTimeCell = document.createElement("div");
+      totalTimeCell.style.flex = "1";
+      totalTimeCell.appendChild(renderTotalTimeElement(group.totalTime));
+      row.appendChild(totalTimeCell);
 
-        // Insert the timeline row after the header row
-        headerRow.insertAdjacentElement("afterend", timelineRow);
-      }
+      // Timeline cell
+      const timelineCell = document.createElement("div");
+      timelineCell.style.flex = "3"; // Make timeline take more space
+      timelineCell.appendChild(renderSvgTimeline(group, maxGroupTotalTime));
+      row.appendChild(timelineCell);
+
+      groupInfoTableBody.appendChild(row);
+      
     });
+
+    groupInfoElement.appendChild(groupInfoTableBody);
+
+    contentContainerElement.appendChild(groupInfoElement);
   }
 
   /**
