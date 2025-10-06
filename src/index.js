@@ -127,15 +127,19 @@
     return totalOverlapTimeMs;
   }
 
-  /**
-   * Returns the maximum total time from an array of group objects.
+
+    /**
+   * Calculates the maximum total time among all groups.
+   * The total time for each group is the sum of `totalTime` and `totalGapTimeMs`.
    *
-   * @param {Array<{totalTime: number}>} groups - An array of group objects, each containing a `totalTime` property.
-   * @returns {number} The highest `totalTime` value among all groups.
+   * @param {Array<{totalTime: number, totalGapTimeMs: number}>} groups - Array of group objects.
+   * @returns {number} The maximum total time found among the groups.
    */
   function getMaxGroupTotalTime(groups) {
-    return Math.max(...groups.map((group) => group.totalTime));
+    return Math.max(...groups.map((group) => group.totalTime + group.totalGapTimeMs));
   }
+
+  
 
   /**
    * Groups table rows within a given <tbody> element based on header rows (rows with an id).
