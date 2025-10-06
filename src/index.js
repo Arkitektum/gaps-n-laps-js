@@ -177,6 +177,7 @@
         // If we encounter a row with an id, start a new group
         currentGroup = {
           headerRowElementId: row.id,
+          dayString: getTableRowDayString(row),
           intervals: [],
         };
         groups.push(currentGroup);
