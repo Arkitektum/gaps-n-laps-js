@@ -248,12 +248,11 @@
    * based on whether the time is outside a specified threshold.
    *
    * @param {number} time - The time value in milliseconds.
-   * @param {string} label - The label to display before the time.
    * @param {number} threshold - The threshold value in milliseconds to compare against.
    * @param {boolean} warningIfExceeded - If true, warns when time exceeds threshold; if false, warns when time is below threshold.
    * @returns {HTMLSpanElement} The styled span element representing the time and status.
    */
-  function renderTimeElement(time, label, threshold, warningIfExceeded) {
+  function renderTimeElement(time, threshold, warningIfExceeded) {
     const timeElement = document.createElement("span");
 
     const timeIsOutsideThreshold = warningIfExceeded
@@ -278,43 +277,42 @@
     // Add warning icon if totalTime is outside threshold
     const warningIcon = timeIsOutsideThreshold ? "⚠️ " : "✅ ";
 
-    timeElement.innerHTML = `${warningIcon}${label}: <span style="font-weight: 500;">${hours}t ${minutes}m</span>`;
+    timeElement.innerHTML = `${warningIcon} <span style="font-weight: 500;">${hours}t ${minutes}m</span>`;
 
     return timeElement;
   }
 
   /**
-   * Renders a time element displaying the total time.
+   * Renders a time element for the total time, applying a threshold of 7.5 hours.
    *
    * @param {number} totalTime - The total time in milliseconds.
    * @returns {HTMLElement} The rendered time element.
    */
   function renderTotalTimeElement(totalTime) {
     const threshold = 7.5 * 60 * 60 * 1000; // 7.5 hours
-    return renderTimeElement(totalTime, "Tid", threshold, false);
+    return renderTimeElement(totalTime, threshold, false);
   }
 
   /**
-   * Renders a time element for a gap period, labeling it as "Pause".
-   * Applies a threshold of 30 minutes to determine formatting.
+   * Renders a time element for a given gap time, applying a threshold of 30 minutes.
    *
-   * @param {number} gapTime - The duration of the gap in milliseconds.
+   * @param {number} gapTime - The gap time in milliseconds to be rendered.
    * @returns {HTMLElement} The rendered time element.
    */
   function renderGapTimeElement(gapTime) {
     const threshold = 30 * 60 * 1000; // 30 minutes
-    return renderTimeElement(gapTime, "Pause", threshold, true);
+    return renderTimeElement(gapTime, threshold, true);
   }
 
   /**
-   * Renders a time element specifically for overlap time.
+   * Renders a time element for the given overlap time.
    *
-   * @param {number} overlapTime - The amount of overlap time to render.
-   * @returns {HTMLElement} The rendered time element for overlap.
+   * @param {number} overlapTime - The time value representing the overlap.
+   * @returns {HTMLElement} The rendered time element.
    */
   function renderOverlapTimeElement(overlapTime) {
     const threshold = 0; // No threshold for overlap
-    return renderTimeElement(overlapTime, "Overlapp", threshold, true);
+    return renderTimeElement(overlapTime, threshold, true);
   }
 
   /**
