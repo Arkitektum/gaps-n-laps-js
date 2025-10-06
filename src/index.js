@@ -139,7 +139,21 @@
     return Math.max(...groups.map((group) => group.totalTime + group.totalGapTimeMs));
   }
 
-  
+  /**
+   * Extracts and returns the trimmed text content of the first <strong> element
+   * inside the first <td> of a given table row.
+   *
+   * @param {HTMLTableRowElement} row - The table row element to extract the day string from.
+   * @returns {string} The trimmed text content of the <strong> element, or an empty string if not found.
+   */
+  function getTableRowDayString(row) {
+    // Get the first <td> in the row
+    const firstTd = row.querySelector("td");
+    if (!firstTd) return "";
+    // Get the first <strong> inside the first <td>
+    const strong = firstTd.querySelector("strong");
+    return strong ? strong.textContent.trim() : "";
+  }
 
   /**
    * Groups table rows within a given <tbody> element based on header rows (rows with an id).
