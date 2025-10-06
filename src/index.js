@@ -334,6 +334,7 @@
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("width", "100%");
     svg.setAttribute("height", "30");
+    svg.setAttribute("overflow", "visible");
 
     group.intervals.forEach((interval) => {
       const rect = document.createElementNS(svgNS, "rect");
