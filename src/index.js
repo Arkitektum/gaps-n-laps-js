@@ -1,15 +1,18 @@
 (function () {
   "use strict";
 
+  
   /**
-   * Parses a string containing time intervals in the format "(HH:MM - HH:MM)"
-   * and returns an array of objects with start and stop Date instances for each interval.
-   * If the stop time is before the start time, the stop time is assumed to be on the next day.
+   * Parses a string containing time intervals and returns an array of interval objects with start and stop times.
+   *
+   * The intervals should be in the format "(HH:MM - HH:MM)", and multiple intervals can be present in the string.
+   * If the stop time is before the start time, it is assumed the interval passes midnight.
    *
    * @param {string} intervalsString - The string containing time intervals to parse.
-   * @returns {Array<{startTime: Date, stopTime: Date}>} Array of interval objects with startTime and stopTime.
+   * @param {string} activity - The activity associated with each interval.
+   * @returns {Array<{startTime: Date, stopTime: Date, activity: string}>} Array of interval objects with startTime, stopTime, and activity.
    */
-  function getIntervalsFromString(intervalsString) {
+  function getIntervalsFromString(intervalsString, activity) {
     // Trim unnecessary spaces
     const text = intervalsString.trim();
 
@@ -38,7 +41,7 @@
         stopTime.setDate(stopTime.getDate() + 1);
       }
 
-      intervals.push({ startTime, stopTime });
+      intervals.push({ startTime, stopTime, activity });
     }
     return intervals;
   }
@@ -155,18 +158,44 @@
     return strong ? strong.textContent.trim() : "";
   }
 
+
   /**
-   * Groups table rows within a given <tbody> element based on header rows (rows with an id).
-   * Each group contains intervals extracted from rows following the header row.
-   * The function also calculates and attaches summary statistics for each group, such as total time,
-   * start time, stop time, total gap time, and total overlap time.
+   * Generates a unique semi-transparent HSL color for each activity in the input array.
+   * Colors are evenly distributed across the hue spectrum.
    *
-   * @param {HTMLTableSectionElement} tbody - The <tbody> element containing the table rows to group.
-   * @returns {Array<Object>} Array of group objects, each with headerRowElementId, intervals, totalTime,
-   *                          startTime, stopTime, totalGapTimeMs, and totalOverlapTimeMs properties.
+   * @param {string[]} activities - Array of activity names to assign colors to.
+   * @returns {Object.<string, string>} An object mapping each activity name to its unique HSLA color string.
+   */
+  function generateUniqueColorForActivities(activities) {
+    const colors = {};
+    const hueStep = Math.floor(360 / activities.length);
+    activities.forEach((activity, index) => {
+      const hue = index * hueStep;
+      colors[activity] = `hsla(${hue}, 70%, 50%, 0.5)`; // HSL color with fixed saturation and lightness
+    });
+    return colors;
+  }
+
+  
+  /**
+   * Groups table rows from a given tbody element into logical groups based on row IDs,
+   * extracts interval data, assigns unique colors to activities, and calculates summary statistics
+   * for each group (total time, start/stop times, gap/overlap times).
+   *
+   * @param {HTMLTableSectionElement} tbody - The table body element containing rows to group.
+   * @returns {Array<Object>} Array of group objects, each containing:
+   *   - headerRowElementId {string}: The ID of the header row for the group.
+   *   - dayString {string}: The day string extracted from the header row.
+   *   - intervals {Array<Object>}: Array of interval objects with activity, startTime, stopTime, and color.
+   *   - totalTime {number}: Total time for all intervals in the group (milliseconds).
+   *   - startTime {number}: Earliest start time among intervals (milliseconds since epoch).
+   *   - stopTime {number}: Latest stop time among intervals (milliseconds since epoch).
+   *   - totalGapTimeMs {number}: Total gap time between intervals (milliseconds).
+   *   - totalOverlapTimeMs {number}: Total overlap time between intervals (milliseconds).
    */
   function groupTableRows(tbody) {
     const groups = [];
+    const activities = new Set();
     let currentGroup = null;
 
     // Get all tr elements inside the tbody
@@ -186,17 +215,28 @@
         const interval = row.querySelector(
           ".timeReportStopwatchIntervals strong"
         );
+        const activity = row?.cells[1]?.textContent?.trim().replace(/\s+/g, " ");
+        if (activity) {
+          activities.add(activity);
+        }
         if (interval) {
           currentGroup.intervals.push(
-            ...getIntervalsFromString(interval.textContent.trim())
+            ...getIntervalsFromString(interval.textContent.trim(), activity)
           );
         }
       }
     });
 
+    const activityColors = generateUniqueColorForActivities(Array.from(activities));
+
     groups.forEach((group) => {
       // Sort intervals by start time
       group.intervals.sort((a, b) => a.startTime - b.startTime);
+
+      // Assign colors to intervals based on activity
+      group.intervals.forEach((interval) => {
+        interval.color = activityColors[interval.activity] || "hsla(0, 0%, 0%, 0.5)"; // Default to semi-transparent black if no color found
+      });
 
       // Calculate total time, start time, stop time, total gap time, and total overlap time
       group.totalTime = getGroupTotalTime(group);
@@ -327,6 +367,7 @@
    * @param {Array<Object>} group.intervals - Array of interval objects.
    * @param {number} group.intervals[].startTime - The start time of the interval.
    * @param {number} group.intervals[].stopTime - The stop time of the interval.
+   * @param {string} group.intervals[].color - The color to fill the interval rectangle.
    * @param {number} maxGroupTotalTime - The maximum total time for the group, used for scaling.
    * @returns {SVGSVGElement} The generated SVG element representing the timeline.
    */
@@ -350,7 +391,7 @@
       rect.setAttribute("ry", "5"); // Rounded corners
       rect.setAttribute("width", `${width}%`);
       rect.setAttribute("height", "30");
-      rect.setAttribute("fill", "rgba(0, 90, 214, 0.5)"); // Semi-transparent blue
+      rect.setAttribute("fill", interval.color);
       rect.setAttribute("stroke", "#757c8a");
       rect.setAttribute("stroke-width", "1");
 
