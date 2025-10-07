@@ -399,6 +399,7 @@
         const maxGroupTotalTime = getMaxGroupTotalTime(groupedRows);
         const contentContainerElement = document.getElementById("wrapperDiv");
         const groupInfoElement = document.createElement("div");
+        groupInfoElement.id = "gapsNLapsContainer";
         groupInfoElement.style.border = "1px solid var(--atl-color-grey-20)";
         groupInfoElement.style.borderRadius = "4px";
         groupInfoElement.style.backgroundColor = "#FFF";
@@ -416,6 +417,38 @@
         groupInfoTitleElement.style.fontFamily = "Rubik,Helvetica,Arial,'sans-serif'";
         groupInfoTitleElement.textContent = "Gaps N' Laps";
         groupInfoElement.appendChild(groupInfoTitleElement);
+
+        const refreshButton = document.createElement("button");
+        refreshButton.textContent = "🔄 Uppfräsk!";
+        refreshButton.style.backgroundColor = "transparent";
+        refreshButton.style.border = "none";
+        refreshButton.style.borderRadius = "4px";
+        refreshButton.style.height = "36px";
+        refreshButton.style.margin = "10px 24px";
+        refreshButton.style.cursor = "pointer";
+        refreshButton.style.minWidth = "64px";
+        refreshButton.style.padding = "0px 16px";
+        refreshButton.style.fontSize = "15px";
+        refreshButton.style.fontWeight = "500";
+        refreshButton.style.letterSpacing = "0";
+        refreshButton.style.textAlign = "center";
+        refreshButton.style.lineHeight = "36px";
+        refreshButton.style.verticalAlign = "middle";
+        refreshButton.style.color = "var(--tlx-theme-link-color)";
+        refreshButton.style.fontFamily = "Rubik,Helvetica,Arial,'sans-serif'";
+        refreshButton.style.float = "right";
+        refreshButton.onclick = () => {
+            const timeReportTable = document.getElementById("timeReportTable");
+
+            if (timeReportTable) {
+                const existingContainer = document.getElementById("gapsNLapsContainer");
+                if (existingContainer) {
+                    existingContainer.remove();
+                }
+                onTableLoaded(timeReportTable);
+            }
+        };
+        groupInfoElement.appendChild(refreshButton);
 
         const groupInfoTableHeader = document.createElement("div");
         const tableHeaderCellStyle =
